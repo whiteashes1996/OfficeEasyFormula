@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
+           xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
+           xsi:type="TaskPaneApp">
+  <Id>7f3a9c2e-4b18-4d6a-8f01-2c5e9a1b6d44</Id>
+  <Version>1.2.0.0</Version>
+  <ProviderName>OfficeEasyFormula</ProviderName>
+  <DefaultLocale>zh-CN</DefaultLocale>
+  <DisplayName DefaultValue="LaTeX 公式"/>
+  <Description DefaultValue="用本机 LaTeX 把公式渲染成图片，插入 Word 文档。"/>
+  <IconUrl DefaultValue="https://localhost:47321/assets/icon-32.png"/>
+  <HighResolutionIconUrl DefaultValue="https://localhost:47321/assets/icon-64.png"/>
+  <SupportUrl DefaultValue="https://localhost:47321/taskpane.html"/>
+  <AppDomains>
+    <AppDomain>https://localhost:47321</AppDomain>
+  </AppDomains>
+  <Hosts>
+    <Host Name="Document"/>
+  </Hosts>
+  <DefaultSettings>
+    <SourceLocation DefaultValue="https://localhost:47321/taskpane.html"/>
+  </DefaultSettings>
+  <Permissions>ReadWriteDocument</Permissions>
+  <Requirements>
+    <Sets DefaultMinVersion="1.1">
+      <Set Name="SharedRuntime" MinVersion="1.1"/>
+    </Sets>
+  </Requirements>
+  <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="VersionOverridesV1_0">
+    <Hosts>
+      <Host xsi:type="Document">
+        <DesktopFormFactor>
+          <GetStarted>
+            <Title resid="GetStarted.Title"/>
+            <Description resid="GetStarted.Description"/>
+            <LearnMoreUrl resid="GetStarted.LearnMoreUrl"/>
+          </GetStarted>
+          <FunctionFile resid="Commands.Url"/>
+          <ExtensionPoint xsi:type="PrimaryCommandSurface">
+            <CustomTab id="Oef.Tab">
+              <Group id="Oef.Group">
+                <Label resid="Oef.GroupLabel"/>
+                <Icon>
+                  <bt:Image size="16" resid="Icon.16"/>
+                  <bt:Image size="32" resid="Icon.32"/>
+                  <bt:Image size="80" resid="Icon.80"/>
+                </Icon>
+                <Control xsi:type="Button" id="Oef.OpenPane">
+                  <Label resid="Oef.ButtonLabel"/>
+                  <Supertip>
+                    <Title resid="Oef.ButtonLabel"/>
+                    <Description resid="Oef.ButtonTip"/>
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="Icon.16"/>
+                    <bt:Image size="32" resid="Icon.32"/>
+                    <bt:Image size="80" resid="Icon.80"/>
+                  </Icon>
+                  <Action xsi:type="ShowTaskpane">
+                    <TaskpaneId>Oef.Taskpane</TaskpaneId>
+                    <SourceLocation resid="Taskpane.Url"/>
+                  </Action>
+                </Control>
+              </Group>
+              <Label resid="Oef.TabLabel"/>
+            </CustomTab>
+          </ExtensionPoint>
+        </DesktopFormFactor>
+      </Host>
+    </Hosts>
+    <Resources>
+      <bt:Images>
+        <bt:Image id="Icon.16" DefaultValue="https://localhost:47321/assets/icon-16.png"/>
+        <bt:Image id="Icon.32" DefaultValue="https://localhost:47321/assets/icon-32.png"/>
+        <bt:Image id="Icon.80" DefaultValue="https://localhost:47321/assets/icon-80.png"/>
+      </bt:Images>
+      <bt:Urls>
+        <bt:Url id="Commands.Url" DefaultValue="https://localhost:47321/commands.html"/>
+        <bt:Url id="Taskpane.Url" DefaultValue="https://localhost:47321/taskpane.html"/>
+        <bt:Url id="GetStarted.LearnMoreUrl" DefaultValue="https://localhost:47321/taskpane.html"/>
+      </bt:Urls>
+      <bt:ShortStrings>
+        <bt:String id="Oef.TabLabel" DefaultValue="LaTeX 公式"/>
+        <bt:String id="Oef.GroupLabel" DefaultValue="公式"/>
+        <bt:String id="Oef.ButtonLabel" DefaultValue="插入公式"/>
+        <bt:String id="GetStarted.Title" DefaultValue="开始使用 LaTeX 公式"/>
+      </bt:ShortStrings>
+      <bt:LongStrings>
+        <bt:String id="Oef.ButtonTip" DefaultValue="打开侧边栏，插入或编辑用本机 LaTeX 渲染的公式"/>
+        <bt:String id="GetStarted.Description" DefaultValue="单击公式后，这里会打开并载入它的 LaTeX。"/>
+      </bt:LongStrings>
+    </Resources>
+    <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides/1.1" xsi:type="VersionOverridesV1_1">
+      <Hosts>
+        <Host xsi:type="Document">
+          <Runtimes>
+            <Runtime resid="Taskpane.Url" lifetime="long"/>
+          </Runtimes>
+          <DesktopFormFactor>
+            <GetStarted>
+              <Title resid="GetStarted.Title"/>
+              <Description resid="GetStarted.Description"/>
+              <LearnMoreUrl resid="GetStarted.LearnMoreUrl"/>
+            </GetStarted>
+            <FunctionFile resid="Taskpane.Url"/>
+            <ExtensionPoint xsi:type="PrimaryCommandSurface">
+              <CustomTab id="Oef.Tab">
+                <Group id="Oef.Group">
+                  <Label resid="Oef.GroupLabel"/>
+                  <Icon>
+                    <bt:Image size="16" resid="Icon.16"/>
+                    <bt:Image size="32" resid="Icon.32"/>
+                    <bt:Image size="80" resid="Icon.80"/>
+                  </Icon>
+                  <Control xsi:type="Button" id="Oef.OpenPane">
+                    <Label resid="Oef.ButtonLabel"/>
+                    <Supertip>
+                      <Title resid="Oef.ButtonLabel"/>
+                      <Description resid="Oef.ButtonTip"/>
+                    </Supertip>
+                    <Icon>
+                      <bt:Image size="16" resid="Icon.16"/>
+                      <bt:Image size="32" resid="Icon.32"/>
+                      <bt:Image size="80" resid="Icon.80"/>
+                    </Icon>
+                    <Action xsi:type="ShowTaskpane">
+                      <TaskpaneId>Oef.Taskpane</TaskpaneId>
+                      <SourceLocation resid="Taskpane.Url"/>
+                      <SupportsPinning>true</SupportsPinning>
+                    </Action>
+                  </Control>
+                </Group>
+                <Label resid="Oef.TabLabel"/>
+              </CustomTab>
+            </ExtensionPoint>
+          </DesktopFormFactor>
+        </Host>
+      </Hosts>
+      <Resources>
+        <bt:Images>
+          <bt:Image id="Icon.16" DefaultValue="https://localhost:47321/assets/icon-16.png"/>
+          <bt:Image id="Icon.32" DefaultValue="https://localhost:47321/assets/icon-32.png"/>
+          <bt:Image id="Icon.80" DefaultValue="https://localhost:47321/assets/icon-80.png"/>
+        </bt:Images>
+        <bt:Urls>
+          <bt:Url id="Taskpane.Url" DefaultValue="https://localhost:47321/taskpane.html"/>
+          <bt:Url id="GetStarted.LearnMoreUrl" DefaultValue="https://localhost:47321/taskpane.html"/>
+        </bt:Urls>
+        <bt:ShortStrings>
+          <bt:String id="Oef.TabLabel" DefaultValue="LaTeX 公式"/>
+          <bt:String id="Oef.GroupLabel" DefaultValue="公式"/>
+          <bt:String id="Oef.ButtonLabel" DefaultValue="插入公式"/>
+          <bt:String id="GetStarted.Title" DefaultValue="开始使用 LaTeX 公式"/>
+        </bt:ShortStrings>
+        <bt:LongStrings>
+          <bt:String id="Oef.ButtonTip" DefaultValue="打开侧边栏，插入或编辑用本机 LaTeX 渲染的公式"/>
+          <bt:String id="GetStarted.Description" DefaultValue="单击公式后，这里会打开并载入它的 LaTeX。"/>
+        </bt:LongStrings>
+      </Resources>
+    </VersionOverrides>
+  </VersionOverrides>
+</OfficeApp>

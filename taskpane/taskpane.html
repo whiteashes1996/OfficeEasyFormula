@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LaTeX 公式</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+    <script type="module" src="./main.ts"></script>
+  </head>
+  <body>
+    <header>
+      <h1>LaTeX 公式</h1>
+      <p id="host-note"></p>
+    </header>
+    <div id="banner" class="banner" hidden></div>
+    <label for="latex">公式</label>
+    <textarea id="latex" rows="7" spellcheck="false" placeholder="例如 \frac{-b \pm \sqrt{b^2-4ac}}{2a}"></textarea>
+    <div class="row">
+      <label><input type="radio" name="display" value="inline" checked /> 行内</label>
+      <label><input type="radio" name="display" value="display" /> 独立</label>
+      <select id="engine" aria-label="编译引擎">
+        <option value="auto">自动引擎</option>
+        <option value="pdflatex">pdfLaTeX</option>
+        <option value="xelatex">XeLaTeX</option>
+      </select>
+    </div>
+    <details>
+      <summary>导言区</summary>
+      <textarea id="preamble" rows="5" spellcheck="false"></textarea>
+    </details>
+    <div id="preview" class="preview" aria-live="polite">
+      <p class="placeholder">预览会显示在这里</p>
+    </div>
+    <pre id="error" hidden></pre>
+    <div class="actions">
+      <button id="primary" type="button">插入</button>
+      <button id="insert-new" type="button" hidden>作为新公式插入</button>
+    </div>
+    <p id="status"></p>
+  </body>
+</html>
