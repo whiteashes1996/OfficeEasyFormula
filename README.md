@@ -1,12 +1,14 @@
 # LaTeX 公式
 
-这是装进 macOS Word 的加载项。功能区「开始」里的「LaTeX 公式」会打开任务窗格，用本机的 MacTeX 把公式渲染成透明图片插入文档。选中公式后，任务窗格会载入原来的 LaTeX，可以改完再更新。
+这是装进 macOS Word 的加载项。功能区「开始」里的「LaTeX 公式」会打开任务窗格，用本机的 MacTeX 把公式渲染成透明矢量图（SVG）插入文档。选中公式后，任务窗格会载入原来的 LaTeX，可以改完再更新。
 
 对方电脑需要已经安装：
 
 - 从微软安装的 Word（Microsoft 365 或官网版本）
-- MacTeX 或 BasicTeX（`/Library/TeX/texbin/pdflatex`）
-- Ghostscript（完整 MacTeX 里通常有；也可以 `brew install ghostscript`）
+- MacTeX 或 BasicTeX（`/Library/TeX/texbin/latex`、`dvisvgm`；含中文时还要 `xelatex`）
+- Ghostscript 共享库（`libgs`，供 dvisvgm 处理 preview 特殊指令；Homebrew 的 `ghostscript` 通常会带上）
+
+BasicTeX 若没有 dvisvgm，可执行 `sudo tlmgr install dvisvgm`。
 
 ## 开发
 

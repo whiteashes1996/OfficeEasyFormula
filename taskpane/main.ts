@@ -1,4 +1,14 @@
-import { DEFAULT_PREAMBLE, type EngineChoice, type HealthResponse, type RenderRequest, type RenderResponse, type RenderSuccess } from "../src/shared/types";
+import {
+  loadStoredPreamble,
+  rememberStoredPreamble,
+  type EngineChoice,
+  type FormulaWrapMode,
+  type HealthResponse,
+  type RenderRequest,
+  type RenderResponse,
+  type RenderSuccess,
+} from "../src/shared/types";
+import { wordInlinePlacement } from "../src/server/tex";
 import { placeFormula, readFormulaRecord, readSelectedPicture, selectionFontSize, type SelectedFormula } from "./word";
 
 const latexInput = document.querySelector<HTMLTextAreaElement>("#latex")!;
@@ -11,6 +21,13 @@ const insertNewButton = document.querySelector<HTMLButtonElement>("#insert-new")
 const status = document.querySelector<HTMLParagraphElement>("#status")!;
 const banner = document.querySelector<HTMLDivElement>("#banner")!;
 const hostNote = document.querySelector<HTMLParagraphElement>("#host-note")!;
+const modeHint = document.querySelector<HTMLParagraphElement>("#mode-hint")!;
+
+const WRAP_MODE_HINTS: Record<FormulaWrapMode, string> = {
+  inline: "只写公式本体，会自动包成 $…$，插在段落里与文字同一行。",
+  display: "只写公式本体，会自动包成 \\begin{equation*}…\\end{equation*}，单独一行居中、无编号。",
+  free: "自行写定界符或环境，例如 $…$、$$…$$、\\begin{equation*}…\\end{equation*}；插件不再自动包一层。",
+};
 
 let inWord = false;
 let fontSizePt = 12;
@@ -28,16 +45,24 @@ function engineChoice(): EngineChoice {
   return value === "pdflatex" || value === "xelatex" ? value : "auto";
 }
 
-function inlineMode(): boolean {
-  return document.querySelector<HTMLInputElement>('input[name="display"]:checked')?.value !== "display";
+function wrapModeChoice(): FormulaWrapMode {
+  const value = document.querySelector<HTMLInputElement>('input[name="display"]:checked')?.value;
+  if (value === "display" || value === "free") return value;
+  return "inline";
+}
+
+function updateWrapModeHint() {
+  modeHint.textContent = WRAP_MODE_HINTS[wrapModeChoice()];
 }
 
 function requestBody(): RenderRequest {
+  const wrapMode = wrapModeChoice();
   return {
     latex: latexInput.value,
     preamble: preambleInput.value,
     engine: engineChoice(),
-    inline: inlineMode(),
+    wrapMode,
+    inline: wordInlinePlacement(wrapMode, latexInput.value),
     fontSizePt,
   };
 }
@@ -62,18 +87,24 @@ function setBusy(next: boolean) {
 }
 
 function rememberPreferences() {
-  localStorage.setItem("oef.preamble", preambleInput.value);
+  rememberStoredPreamble(localStorage, preambleInput.value);
   localStorage.setItem("oef.engine", engineInput.value);
-  localStorage.setItem("oef.inline", inlineMode() ? "1" : "0");
+  localStorage.setItem("oef.wrapMode", wrapModeChoice());
   localStorage.setItem("oef.draft", latexInput.value);
 }
 
 function restorePreferences() {
-  preambleInput.value = localStorage.getItem("oef.preamble") ?? DEFAULT_PREAMBLE;
+  preambleInput.value = loadStoredPreamble(localStorage);
   engineInput.value = localStorage.getItem("oef.engine") ?? "auto";
-  const inline = localStorage.getItem("oef.inline") !== "0";
-  const radio = document.querySelector<HTMLInputElement>(`input[name="display"][value="${inline ? "inline" : "display"}"]`);
+  const storedMode = localStorage.getItem("oef.wrapMode");
+  let wrapMode: FormulaWrapMode =
+    storedMode === "inline" || storedMode === "display" || storedMode === "free" ? storedMode : "inline";
+  if (!storedMode) {
+    wrapMode = localStorage.getItem("oef.inline") === "0" ? "display" : "inline";
+  }
+  const radio = document.querySelector<HTMLInputElement>(`input[name="display"][value="${wrapMode}"]`);
   if (radio) radio.checked = true;
+  updateWrapModeHint();
   const draft = localStorage.getItem("oef.draft");
   if (draft) latexInput.value = draft;
 }
@@ -88,7 +119,7 @@ function showPreview(result: RenderSuccess) {
   preview.replaceChildren();
   const image = document.createElement("img");
   image.alt = latexInput.value.trim() || "公式预览";
-  image.src = `data:image/png;base64,${result.pngBase64}`;
+  image.src = `data:image/svg+xml;base64,${result.svgBase64}`;
   preview.append(image);
   showError("");
   const engineName = result.engine === "xelatex" ? "XeLaTeX" : "pdfLaTeX";
@@ -156,10 +187,10 @@ function applyRecord(selected: SelectedFormula) {
   if (record.latex && record.latex !== latexInput.value) latexInput.value = record.latex;
   preambleInput.value = record.preamble;
   engineInput.value = record.engine;
-  const radio = document.querySelector<HTMLInputElement>(
-    `input[name="display"][value="${record.inline ? "inline" : "display"}"]`,
-  );
+  const wrapMode = record.wrapMode ?? (record.inline ? "inline" : "display");
+  const radio = document.querySelector<HTMLInputElement>(`input[name="display"][value="${wrapMode}"]`);
   if (radio) radio.checked = true;
+  updateWrapModeHint();
   if (record.fontSizePt > 0) fontSizePt = record.fontSizePt;
   applying = false;
 }
@@ -241,12 +272,14 @@ async function commit(mode: "insert" | "update" | "insert-new") {
   setBusy(true);
   try {
     const rendered = await renderForInsert();
+    const wrapMode = wrapModeChoice();
     const placed = await placeFormula({
       latex: latexInput.value,
       preamble: preambleInput.value,
       engine: rendered.engine,
-      inline: inlineMode(),
-      pngBase64: rendered.pngBase64,
+      wrapMode,
+      inline: wordInlinePlacement(wrapMode, latexInput.value),
+      svgBase64: rendered.svgBase64,
       widthPt: rendered.widthPt,
       heightPt: rendered.heightPt,
       depthPt: rendered.depthPt,
@@ -293,9 +326,10 @@ async function loadHealth() {
     banner.textContent = "连不上本机编译服务。安装后它会在登录时自动启动；开发时请运行 npm run dev。";
     return;
   }
-  if (!healthState.pdflatex || !healthState.gs) {
+  if (!healthState.latex || !healthState.dvisvgm) {
     banner.hidden = false;
-    banner.textContent = "找不到 pdfLaTeX 或 Ghostscript。请安装 MacTeX，并确认 /Library/TeX/texbin/pdflatex 存在。";
+    banner.textContent =
+      "找不到 latex 或 dvisvgm。请安装 MacTeX；BasicTeX 可执行 sudo tlmgr install dvisvgm。";
     return;
   }
   banner.hidden = true;
@@ -312,8 +346,12 @@ function start(wordHost: boolean) {
   preambleInput.addEventListener("input", onEdit);
   engineInput.addEventListener("change", onEdit);
   for (const radio of Array.from(document.querySelectorAll<HTMLInputElement>('input[name="display"]'))) {
-    radio.addEventListener("change", onEdit);
+    radio.addEventListener("change", () => {
+      updateWrapModeHint();
+      onEdit();
+    });
   }
+  updateWrapModeHint();
   primaryButton.addEventListener("click", () => void commit(loaded ? "update" : "insert"));
   insertNewButton.addEventListener("click", () => void commit("insert-new"));
   document.addEventListener("keydown", (event) => {

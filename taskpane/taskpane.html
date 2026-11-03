@@ -16,15 +16,20 @@
     <div id="banner" class="banner" hidden></div>
     <label for="latex">公式</label>
     <textarea id="latex" rows="7" spellcheck="false" placeholder="例如 \frac{-b \pm \sqrt{b^2-4ac}}{2a}"></textarea>
-    <div class="row">
-      <label><input type="radio" name="display" value="inline" checked /> 行内</label>
-      <label><input type="radio" name="display" value="display" /> 独立</label>
-      <select id="engine" aria-label="编译引擎">
-        <option value="auto">自动引擎</option>
-        <option value="pdflatex">pdfLaTeX</option>
-        <option value="xelatex">XeLaTeX</option>
-      </select>
-    </div>
+    <fieldset class="mode-field">
+      <legend class="mode-legend">排版</legend>
+      <div class="row mode-row">
+        <label><input type="radio" name="display" value="inline" checked /> 行内</label>
+        <label><input type="radio" name="display" value="display" /> 独立</label>
+        <label><input type="radio" name="display" value="free" /> 自由</label>
+        <select id="engine" aria-label="编译引擎">
+          <option value="auto">自动引擎</option>
+          <option value="pdflatex">pdfLaTeX</option>
+          <option value="xelatex">XeLaTeX</option>
+        </select>
+      </div>
+      <p id="mode-hint" class="mode-hint" aria-live="polite"></p>
+    </fieldset>
     <details>
       <summary>导言区</summary>
       <textarea id="preamble" rows="5" spellcheck="false"></textarea>

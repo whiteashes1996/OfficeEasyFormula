@@ -22,7 +22,8 @@ export async function handleApi(req: IncomingMessage, res: ServerResponse): Prom
         latex: request.latex,
         preamble: typeof request.preamble === "string" ? request.preamble : "",
         engine: request.engine ?? "auto",
-        inline: request.inline !== false,
+        wrapMode: request.wrapMode,
+        inline: request.inline,
         fontSizePt: typeof request.fontSizePt === "number" ? request.fontSizePt : 12,
       });
       sendJson(res, result.ok ? 200 : 422, result);

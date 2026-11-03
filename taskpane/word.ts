@@ -1,5 +1,5 @@
 import { injectBaseline, newFormulaId } from "../src/shared/baseline";
-import { PREVIEW_BORDER_PT, TEX_NAMESPACE, type FormulaRecord } from "../src/shared/types";
+import { PREVIEW_BORDER_PT, TEX_NAMESPACE, type FormulaRecord, type FormulaWrapMode } from "../src/shared/types";
 
 const TAG_PREFIX = "oef:";
 const TITLE_PREFIX = "OEF:";
@@ -15,8 +15,9 @@ export interface PlaceRequest {
   latex: string;
   preamble: string;
   engine: FormulaRecord["engine"];
+  wrapMode: FormulaWrapMode;
   inline: boolean;
-  pngBase64: string;
+  svgBase64: string;
   widthPt: number;
   heightPt: number;
   depthPt: number;
@@ -246,6 +247,7 @@ export async function placeFormula(request: PlaceRequest): Promise<PlaceResult> 
     latex: request.latex,
     preamble: request.preamble,
     engine: request.engine,
+    wrapMode: request.wrapMode,
     inline: request.inline,
     depthPt: request.depthPt,
     naturalWidthPt: request.widthPt,
@@ -259,7 +261,7 @@ export async function placeFormula(request: PlaceRequest): Promise<PlaceResult> 
     if (request.mode === "update") {
       const current = await pictureById(context, id);
       if (!current) throw new Error("找不到文档里的这条公式，可能已经被删除。");
-      picture = current.insertInlinePictureFromBase64(request.pngBase64, Word.InsertLocation.replace);
+      picture = current.insertInlinePictureFromBase64(request.svgBase64, Word.InsertLocation.replace);
     } else {
       const host = request.inline
         ? await inlineInsertionHost(selection)
@@ -268,7 +270,7 @@ export async function placeFormula(request: PlaceRequest): Promise<PlaceResult> 
       control.title = "OfficeEasyFormula";
       control.tag = `${TAG_PREFIX}${id}`;
       control.appearance = Word.ContentControlAppearance.hidden;
-      picture = control.insertInlinePictureFromBase64(request.pngBase64, Word.InsertLocation.replace);
+      picture = control.insertInlinePictureFromBase64(request.svgBase64, Word.InsertLocation.replace);
     }
     decorate(picture, id, request.latex, width, height);
     await context.sync();
